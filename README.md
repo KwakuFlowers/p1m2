@@ -11,7 +11,7 @@
 
 # What to do to get started#
 1) Install all requiremeents in the requirement.txt file onto a virtual environment, so that program can run the functions
-2) Clone the repo to a local machine and set the portr to 5000 so that it can runn locally
+2) Clone the repo to a local machine and set the port to 5000 so that it can runn locally
 
 # Technical Problems #
 
