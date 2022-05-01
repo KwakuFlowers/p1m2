@@ -1,11 +1,25 @@
 import flask
 import random
+from dbmodel import User
 import os
 from Genius import songlyrics
 from Spot import artistsongs
 
 app = flask.Flask(__name__)
+from flask_login import LoginManager
+login_manager = LoginManager()
 
+login_manager.init_app(app)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.get(user_id)
+
+
+@app.route("/random")
+def start():
+    #possibly move everything from main into here and have login 
+    #be first thing User does on app
 
 @app.route("/")
 def main():
