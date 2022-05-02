@@ -17,6 +17,7 @@ api_token_url = "https://accounts.spotify.com/api/token"
 
 def artistsongs(artid):
     Art_song_url = f"{GetReqURL}/artists/{artid}/top-tracks"
+    Art_url = f"{GetReqURL}/artists/{artid}"
     country = {"country": "US"}
 
     head = {
@@ -26,7 +27,11 @@ def artistsongs(artid):
     }
     randomsong = random.randint(0, 9)
     songs = requests.get(Art_song_url, params=country, headers=head)
+    artistinfo = requests.get(Art_url, headers=head)
     songinfo = songs.json()
+    artinfo = artistinfo.json()
+    artistname = artinfo["name"]
+    # print(artistname)
     # track genreal info search
     randsonginfo = songinfo["tracks"][randomsong]
     # print(randsonginfo)
@@ -75,6 +80,7 @@ def artistsongs(artid):
         randsonginfo_imageurl,
         randsonginfo_imageH,
         randsonginfo_imageW,
+        artistname,
     )
 
 
@@ -95,4 +101,4 @@ def authorize():
     return f"{token}"
 
 
-artistsongs("3TVXtAsR1Inumwj472S9r4")
+# artistsongs("3TVXtAsR1Inumwj472S9r4")  # used for testing in earlier implementations

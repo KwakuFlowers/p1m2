@@ -27,11 +27,20 @@ if userinfourl.startswith("postgres://"):
     # print(userinfourl)
 app.config["SQLALCHEMY_DATABASE_URI"] = userinfourl
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.secret_key = "I am a secret key"
+app.secret_key = "secret key"
 
 engine = create_engine(
-    userinfourl, pool_size=20, max_overflow=0  # uncomment for other push to git
+    userinfourl, pool_size=50, max_overflow=0  # uncomment for other push to git
 )
+
+
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    DB.session.remove()
+
+
+# used to allow server to add 50 different eviews in 1 session before error occurs
+# Might need more in the future, but for current implementations, it should be fine
 
 DB = SQLAlchemy(app)
 
@@ -98,19 +107,21 @@ def login():
 def new_review():
     rev = flask.request.form
     rating = rev.get("rating")
+    artist = rev.get("artist")
     review = rev.get("review")
     Song = rev.get("song")
     # art_name = rev.get("artname")
 
-    cur = Song_review(
+    cur = Song_review(  # exactly the same as adding a new user to DB
         Username=current_user.Username,
         songrate=rating,
         songcomments=review,
-        Song=Song
-        # Art_name = art_name possible implementation to seperate reviews if artists have the same named song
+        Song=Song,
+        Art_name=artist,  # possible implementation to seperate reviews if artists have the same named song
     )
     DB.session.add(cur)
     DB.session.commit()
+    shutdown_session()
     return redirect("rand")
 
 
@@ -133,13 +144,14 @@ def rand():
         randsonginfo_imageurl,
         randsonginfo_imageH,
         randsonginfo_imageW,
+        artistname,
     ) = artistsongs(newartisitid)
     currsongname = randsonginfo_name
     geniuslink = songlyrics(currsongname)
-    print(currsongname)
-    # Art_name =newartisitid#
-    review = Song_review.query.filter_by(Song=currsongname).all()
-    print(review)
+    # print(currsongname)
+    # Art_name = newartisitid#
+    review = Song_review.query.filter_by(Song=currsongname, Art_name=artistname).all()
+    # print(review) tests why Song reviews weren't saving and how to implement them to webpage
 
     return flask.render_template(
         "start.html",
@@ -153,6 +165,7 @@ def rand():
         genlink=geniuslink,
         Song=currsongname,
         reviewed=review,
+        artistname=artistname,
     )
     # possibly move everything from main into here and have login
     # be first thing User does on app
@@ -161,7 +174,7 @@ def rand():
 @app.route("/logout")
 def logout():
     logout_user()
-    return redirect("signup")
+    return redirect("login")
 
 
 if __name__ == "__main__":
