@@ -1,21 +1,35 @@
-from database import DB
+from app import DB, LoginManager
 import flask
 import os
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import (
+    LoginManager,
+    login_user,
+    current_user,
+    login_required,
+    UserMixin,
+)
 
 
 class User(DB.Model):
-    id = DB.Culumn(DB.Integer, primary_key=True)
-    Username = DB.Column(DB.string(256), is_nullable=False)
-    email = DB.Column(DB.String(256), unique=True)
-    password = DB.Column(DB.String(256), unique=True, is_nullable=False)
+    id = DB.Column(DB.Integer, primary_key=True)
+    Username = DB.Column(DB.String(256))
+    Email = DB.Column(DB.String(256), unique=True)
+    Password = DB.Column(DB.String(256), unique=True)
+
+    def get_id(self):
+        return self.Email
+
+    def is_active(self):
+        return True
 
 
 class Song_review(DB.Model):
-    id = DB.Culumn(DB.Integer, primary_key=True)
-    Username = DB.Column(DB.string(256), is_nullable=False)
-    Song = DB.Column(DB.Integer, is_nullable=False)
-    songrate = DB.Column(DB.Integer, is_nullable=False)
-    songcomments = DB.Column(DB.string(256), is_nullable=False)
+    id = DB.Column(DB.Integer, primary_key=True)
+    Username = DB.Column(DB.String(256))
+    Song = DB.Column(DB.Integer)
+    songrate = DB.Column(DB.Integer)
+    songcomments = DB.Column(DB.String(256))
 
 
-# DB.create_all()
+DB.create_all()  # uncomment when ready to push columns to database

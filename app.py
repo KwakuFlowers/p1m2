@@ -1,28 +1,94 @@
 import flask
+from flask import Flask, render_template, redirect, session, url_for, request, flash
 import random
-from dbmodel import User
+from dbmodel import *
 import os
 from Genius import songlyrics
 from Spot import artistsongs
 
 app = flask.Flask(__name__)
-from flask_login import LoginManager
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import (
+    LoginManager,
+    login_user,
+    current_user,
+    login_required,
+    UserMixin,
+)
+
 login_manager = LoginManager()
+userinfourl = os.getenv("USERDATA_URL")
+
+if userinfourl.startswith("postgres://"):
+    userinfourl = userinfourl.replace("postgres://", "postgresql://", 1)
+    # print(userinfourl)
+app.config["SQLALCHEMY_DATABASE_URI"] = userinfourl
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.secret_key = "I am a secret key"
+
+DB = SQLAlchemy(app)
 
 login_manager.init_app(app)
 
+
 @login_manager.user_loader
 def load_user(user_id):
-    return User.get(user_id)
+    return User.query.filter_by(Email=user_id).first()
 
 
-@app.route("/random")
-def start():
-    #possibly move everything from main into here and have login 
-    #be first thing User does on app
+login_manager.login_view = "login"
+
 
 @app.route("/")
 def main():
+    return flask.redirect("signup")
+    # used for base place where user goes
+
+
+@app.route("/signup", methods=["GET", "POST"])
+def signup():
+    if flask.request.method == "GET":
+        return flask.render_template("signup.html")
+    userinfo = flask.request.form
+    Username2 = userinfo["Username2"]
+    Password2 = userinfo["Password2"]
+    Email2 = userinfo["Email2"]
+
+    found = User.query.filter_by(Email=Email2).first()
+
+    if found != None:
+        return flask.render_template("signup.html")
+    else:
+        adduser = User(Username=Username2, Password=Password2, Email=Email2)
+        DB.session.add(adduser)
+        DB.session.commit()
+        return flask.redirect("login")
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if flask.request.method == "GET":
+        return flask.render_template("login.html")
+
+    userinfo = flask.request.form
+    Username2 = userinfo["Username2"]
+    Password2 = userinfo["Password2"]
+    Email2 = userinfo["Email2"]
+
+    found = User.query.filter_by(
+        Username=Username2, Password=Password2, Email=Email2
+    ).first()
+
+    if found == None:
+        flask.flash("Email not found.")
+        return flask.render_template("login.html")
+    else:
+        login_user(found)
+        return flask.redirect("rand")
+
+
+@app.route("/rand")
+def rand():
     artistid = [
         "3TVXtAsR1Inumwj472S9r4",  # Drake
         "5f7VJjfbwm532GiveGC0ZK",  # Lil Baby
@@ -57,10 +123,13 @@ def main():
         genlink=geniuslink,
     )
 
+    # possibly move everything from main into here and have login
+    # be first thing User does on app
+
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8080))
-    app.run(host="0.0.0.0", port=port)
+    # port = int(os.environ.get("PORT", 8080)) #uncomment when pushing to heroku and no local testing
+    app.run()  # host="0.0.0.0", port=port)
 
 # app.run(
 #    host=os.getenv("IP", "0.0.0.0"), port=port, debug=False #uncomment when sending to heroku
