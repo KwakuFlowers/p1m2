@@ -27,7 +27,8 @@ class User(DB.Model):
 class Song_review(DB.Model):
     id = DB.Column(DB.Integer, primary_key=True)
     Username = DB.Column(DB.String(256))
-    Song = DB.Column(DB.Integer)
+    # Art_name = DB.Column(DB.String(256))
+    Song = DB.Column(DB.String(50))
     songrate = DB.Column(DB.Integer)
     songcomments = DB.Column(DB.String(256))
 

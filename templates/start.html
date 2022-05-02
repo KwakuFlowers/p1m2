@@ -7,13 +7,33 @@
 </head>
 
 <body>
+    <a href="/logout">Log Out and Return Home</a>
     <h1> Song Name: {{songname}}</h1>
     <h1>Popularity (out of 100%) : {{popularity}}</h1>
     <a href={{spotlink}}>Click for the Spotify link!!!</a>
     <h1>Release Date : {{releasedate}}</h1>
     <img src={{imageurl}} width={{imagewidth}} height={{imageheight}} />
     <a href={{genlink}}>Click for the Genius lyrics!!!</a>
+    <h1> Truths left by our Users!</h1>
+    <div class="review_section">
 
+        {% for rev in reviewed %}
+        <div class="re">
+            <p> User was {{rev.Username}}</p>
+            <p> Honest Truth:{{rev.songcomments}}</p>
+            <p> Rating is {{rev.songrate}}</p>
+        </div>
+        {% endfor %}
+        <h1> Whats your honest truth about {{Song}}?</h1>
+        <form method="POST" action="/new_review">
+            <input type="text" name="song" value="{{Song}}" readonly="readonly" />
+            <!-- <input type="text" name="song" value="{{Art_name}}" readonly="readonly" /> -->
+            <input id="rate" type="number" name="rating" min="1" max="10" />
+            <textarea id="songcomments" name="review"></textarea>
+            <!--<input type = "submit" value="Review" maxlength="200" placeholder="Write your opinion here"/> this line didn't seem to work right -->
+            <input type="submit" value="The Truth Sucks!" />
+        </form>
+    </div>
 </body>
 
 </html>
