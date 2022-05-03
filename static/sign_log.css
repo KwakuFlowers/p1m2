@@ -1,0 +1,62 @@
+body {
+    background-color: burlywood;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.sign,
+.log {
+    background-color: rgb(13, 175, 13);
+    height: 50vh;
+    width: 50vw;
+    display: flex;
+    flex-direction: column;
+    min-height: 50px;
+    font-family: sans-serif;
+}
+
+.login_button,
+.signup_button {
+    width: 149px;
+    height: 42px;
+    background-color: green;
+    border-radius: 10px;
+    margin: 15px;
+    margin-top: 125px;
+    position: relative;
+    text-align: center;
+    cursor: pointer;
+}
+
+.sign form,
+.log form {
+    width: 240px;
+    height: 330px;
+    justify-content: center;
+    background-color: green;
+    padding: 10px 0px 0px 4px;
+    margin-left: 220px;
+    border-radius: 15px;
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+    font-family: "Century Gothic";
+}
+
+.sign input:focus,
+.log input:focus {
+    background-color: green;
+}
+
+.sign input,
+.log input {
+    width: 195px;
+    height: 20px;
+    margin: 20px 0px 0px 20px;
+    border: 0px;
+    font-weight: bold;
+    justify-content: center;
+
+}

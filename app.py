@@ -3,6 +3,9 @@ from flask import Flask, render_template, redirect, session, url_for, request, f
 import random
 
 from sqlalchemy import create_engine
+from sqlalchemy.pool import QueuePool, NullPool
+from sqlalchemy.orm import sessionmaker
+
 from dbmodel import *
 import os
 from Genius import songlyrics
@@ -26,21 +29,28 @@ if userinfourl.startswith("postgres://"):
     userinfourl = userinfourl.replace("postgres://", "postgresql://", 1)
     # print(userinfourl)
 app.config["SQLALCHEMY_DATABASE_URI"] = userinfourl
+# app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+#    "pool_size": 20,
+#    "pool_recycle": 10,
+#    "pool_pre_ping": True,
+# }
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.secret_key = "secret key"
 
-engine = create_engine(
-    userinfourl, pool_size=50, max_overflow=0  # uncomment for other push to git
-)
+# engine = create_engine(
+#    userinfourl, poolclass=NullPool  # uncomment for other push to git
+# )
+#
+# Session = sessionmaker(engine)
 
 
-@app.teardown_appcontext
-def shutdown_session(exception=None):
-    DB.session.remove()
+# @app.teardown_appcontext
+# def shutdown_session(exception=None):
+# DB.session.remove()
 
 
-# used to allow server to add 50 different eviews in 1 session before error occurs
-# Might need more in the future, but for current implementations, it should be fine
+# Everything in comments above are my attempts to create an engine through the app in order for the app to
+# constinously  add data to database without getting an error for too many connections to database.
 
 DB = SQLAlchemy(app)
 
@@ -73,6 +83,7 @@ def signup():
     found = User.query.filter_by(Email=Email2).first()
 
     if found != None:
+        flash("User already exists with that email")
         return flask.render_template("signup.html")
     else:
         adduser = User(Username=Username2, Password=Password2, Email=Email2)
@@ -96,7 +107,7 @@ def login():
     ).first()
 
     if found == None:
-        flask.flash("Email not found.")
+        flash("You aren't registered! Return to signup!")
         return flask.render_template("login.html")
     else:
         login_user(found)
@@ -121,7 +132,7 @@ def new_review():
     )
     DB.session.add(cur)
     DB.session.commit()
-    shutdown_session()
+    DB.session.close()
     return redirect("rand")
 
 

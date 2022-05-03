@@ -24,6 +24,26 @@ body a {
     font-size: 70px;
 }
 
-review_section {
-    margin: 0 auto;
+.review_section form {
+    margin: 10px;
+    background-color: burlywood;
+    background-size: contain;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.review_section input {
+    margin: 20px;
+}
+
+.re {
+    margin: 10px;
+    background-color: burlywood;
+
+}
+
+.re p {
+    font-weight: bold;
 }
